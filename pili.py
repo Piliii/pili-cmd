@@ -1,4 +1,3 @@
-# pili.py
 import sys
 import webbrowser
 import random
@@ -26,26 +25,19 @@ def get_excuse():
         data = response.json()
         print(data.get("excuse", "No excuse found."))
     except Exception as e:
-        print("Failed to get excuse:", e)
+        print("Failed to fetch:", e)
 
 def secret_art():
     ascii_arts = [
         r"""
  (\_._/)
-    ( o o )
-   /  O  \
+ ( o o )
+ /  O  \
  """,
         r"""
- /\_/\
+   /\_/\
   ( o.o )
    > ^ <
-  """,
-        r"""
- |\_/|
-   |q p|   /}
-  ( 0 )"\
- |"^"`    |
-   ||_/=\\__|
   """
     ]
     print(random.choice(ascii_arts))
@@ -83,7 +75,7 @@ def weather(city):
         response = requests.get(url)
         print(response.text)
     except Exception as e:
-        print("Failed to fetch weather:", e)
+        print("Failed to fetch:", e)
 
 def countdown(seconds):
     try:
@@ -126,9 +118,114 @@ def show_memory():
     except Exception as e:
         print("Failed to get memory info:", e)
 
+def show_disk_usage():
+    """Show disk usage for all mounted partitions."""
+    try:
+        partitions = psutil.disk_partitions()
+        print("💽 Disk Usage:")
+        for p in partitions:
+            try:
+                usage = psutil.disk_usage(p.mountpoint)
+                print(f"  {p.device} ({p.mountpoint}): {usage.percent}% used, {usage.used // (1024**3)}GB/{usage.total // (1024**3)}GB")
+            except PermissionError:
+                continue
+    except Exception as e:
+        print("Failed to get disk usage:", e)
+
+def list_processes(top_n=10):
+    """List top N processes by memory usage."""
+    try:
+        processes = []
+        for proc in psutil.process_iter(['pid', 'name', 'cpu_percent', 'memory_percent']):
+            processes.append(proc.info)
+        processes.sort(key=lambda x: x['memory_percent'], reverse=True)
+        print(f"🗂️ Top {top_n} processes by memory usage:")
+        print(f"{'PID':>6} {'CPU%':>6} {'MEM%':>6} Name")
+        for p in processes[:top_n]:
+            print(f"{p['pid']:>6} {p['cpu_percent']:>6.1f} {p['memory_percent']:>6.1f} {p['name']}")
+    except Exception as e:
+        print("Failed to list processes:", e)
+
+def kill_process():
+    """Kill a process by PID."""
+    if len(sys.argv) < 3:
+        print("Usage: pili kill <pid>")
+        return
+    try:
+        pid = int(sys.argv[2])
+        p = psutil.Process(pid)
+        p.terminate()
+        print(f"🛑 Process {pid} terminated.")
+    except Exception as e:
+        print("Failed to kill process:", e)
+
+def show_network_interfaces():
+    """Show network interfaces and their IP addresses."""
+    try:
+        addrs = psutil.net_if_addrs()
+        stats = psutil.net_if_stats()
+        print("🌐 Network Interfaces:")
+        for iface, addr_list in addrs.items():
+            status = "UP" if stats[iface].isup else "DOWN"
+            ips = [a.address for a in addr_list if a.family == 2]
+            print(f"  {iface} [{status}]: {', '.join(ips) if ips else 'No IPv4'}")
+    except Exception as e:
+        print("Failed to get network interfaces:", e)
+
+def show_battery_status():
+    """Show battery status if available."""
+    try:
+        battery = psutil.sensors_battery()
+        if battery is None:
+            print("🔋 No battery found.")
+            return
+        plugged = "Charging" if battery.power_plugged else "Not charging"
+        print(f"🔋 Battery: {battery.percent}% ({plugged})")
+    except Exception as e:
+        print("Failed to get battery status:", e)
+
+def show_boot_time():
+    """Show system boot time."""
+    try:
+        boot = datetime.fromtimestamp(psutil.boot_time())
+        print("🕒 System boot time:", boot.strftime("%Y-%m-%d %H:%M:%S"))
+    except Exception as e:
+        print("Failed to get boot time:", e)
+
+def show_env_vars():
+    """Show all environment variables or a specific one."""
+    if len(sys.argv) == 2:
+        for k, v in os.environ.items():
+            print(f"{k}={v}")
+    else:
+        key = sys.argv[2]
+        print(f"{key}={os.environ.get(key, '[Not set]')}")
+
+def show_current_user():
+    """Show the current logged-in user."""
+    try:
+        user = os.getlogin() if hasattr(os, 'getlogin') else os.environ.get('USERNAME') or os.environ.get('USER')
+        print(f"👤 Current user: {user}")
+    except Exception as e:
+        print("Failed to get current user:", e)
+
+def show_top_processes():
+    """Show top 5 processes by CPU usage."""
+    try:
+        processes = []
+        for proc in psutil.process_iter(['pid', 'name', 'cpu_percent']):
+            processes.append(proc.info)
+        processes.sort(key=lambda x: x['cpu_percent'], reverse=True)
+        print("🔥 Top 5 processes by CPU usage:")
+        print(f"{'PID':>6} {'CPU%':>6} Name")
+        for p in processes[:5]:
+            print(f"{p['pid']:>6} {p['cpu_percent']:>6.1f} {p['name']}")
+    except Exception as e:
+        print("Failed to get top processes:", e)
+
 def speedtest():
     print("🌐 Running speed test...")
-    print("⚠️  Note: Install speedtest-cli for accurate results: pip install speedtest-cli")
+    # Note: Install speedtest-cli for accurate results: pip install speedtest-cli
     
     try:
         # Try to use speedtest-cli if available
@@ -350,8 +447,6 @@ def remind_me():
         print("Failed to set reminder:", e)
 
 def tictactoe():
-    import random
-
     board = [" "] * 9
 
     def print_board():
@@ -502,6 +597,28 @@ def confetti_animation(winner_text):
     print(f"🏆 {winner_text} 🏆")
     print("="*40 + "\n")
 
+def mock_text():
+    if len(sys.argv) < 3:
+        print("Usage: pili mock <text>")
+        return
+    
+    text = " ".join(sys.argv[2:])
+    result = ""
+    uppercase = False
+    
+    for char in text:
+        if char.isalpha():
+            if uppercase:
+                result += char.upper()
+            else:
+                result += char.lower()
+            uppercase = not uppercase
+        else:
+            result += char
+    
+    print(f"🤡 mOcKiNg: {result}")
+
+# --- Main program ---
 def main():
     if len(sys.argv) < 2:
         print("Usage: pili <command> [args]")
@@ -509,7 +626,7 @@ def main():
         print("🌐 website, hello, excuse, secret, coinflip")
         print("⏰ time, uptime, countdown, remind")
         print("🌤️ weather, speedtest")
-        print("🖥️ cpu, memory")
+        print("🖥️ cpu, memory, disk, procs, kill, net, battery, boot, env, user, top")
         print("🎲 dice, ttt")
         print("📝 zalgo, reverse, mock, leet, flip")
         return
@@ -547,6 +664,25 @@ def main():
         show_cpu()
     elif command == "memory":
         show_memory()
+    elif command == "disk":
+        show_disk_usage()
+    elif command == "procs":
+        top_n = int(args[0]) if args and args[0].isdigit() else 10
+        list_processes(top_n)
+    elif command == "kill":
+        kill_process()
+    elif command == "net":
+        show_network_interfaces()
+    elif command == "battery":
+        show_battery_status()
+    elif command == "boot":
+        show_boot_time()
+    elif command == "env":
+        show_env_vars()
+    elif command == "user":
+        show_current_user()
+    elif command == "top":
+        show_top_processes()
     elif command == "speedtest":
         speedtest()
     elif command == "dice":
@@ -571,7 +707,7 @@ def main():
         print("🌐 website, hello, excuse, secret, coinflip")
         print("⏰ time, uptime, countdown, remind")
         print("🌤️ weather, speedtest")
-        print("🖥️ cpu, memory")
+        print("🖥️ cpu, memory, disk, procs, kill, net, battery, boot, env, user, top")
         print("🎲 dice, ttt")
         print("📝 zalgo, reverse, mock, leet, flip")
 

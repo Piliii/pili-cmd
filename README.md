@@ -7,7 +7,8 @@ A fun and versatile Python command-line utility that brings together system moni
 ### 🌐 Web & Network
 - **website** - Opens ayopili.com in your browser
 - **weather [city]** - Get current weather for any city
-- **speedtest** - Test your internet connection speed
+- **speedtest** - Test your internet connection speed (uses `speedtest-cli` if available, else basic ping)
+- **net** - Show network interfaces and their IP addresses
 
 ### 🎮 Entertainment & Games
 - **hello** - Random friendly greetings
@@ -22,10 +23,18 @@ A fun and versatile Python command-line utility that brings together system moni
 - **uptime** - Display system uptime
 - **countdown [seconds]** - Start a countdown timer with beep
 - **remind [minutes] [message]** - Set a reminder with notification
+- **boot** - Show system boot time
 
 ### 🖥️ System Monitoring
 - **cpu** - Show CPU usage, cores, and frequency
 - **memory** - Display RAM usage and availability
+- **disk** - Show disk usage for all partitions
+- **procs [N]** - List top N processes by memory usage (default: 10)
+- **top** - Show top 5 processes by CPU usage
+- **kill [pid]** - Kill a process by PID
+- **battery** - Show battery status if available
+- **env [VAR]** - Show all environment variables or a specific one
+- **user** - Show the current logged-in user
 
 ### 📝 Text Manipulation
 - **zalgo [text]** - Convert text to spooky zalgo format
@@ -82,16 +91,28 @@ pili coinflip
 # Weather and network
 pili weather London
 pili speedtest
+pili net
 
 # System info
 pili cpu
 pili memory
+pili disk
 pili uptime
+pili procs 5
+pili top
+pili kill 1234
+pili battery
+pili boot
+pili env
+pili env PATH
+pili user
 
 # Text fun
 pili zalgo "Hello World"
 pili mock "this is serious"
 pili leet "elite hacker"
+pili reverse "desserts"
+pili flip "hello"
 
 # Games
 pili dice 20 2      # Roll 2 twenty-sided dice
