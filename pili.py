@@ -9,6 +9,7 @@ import platform
 import psutil
 import subprocess
 import threading
+import socket
 
 def open_website():
     print("🌐 Opening ayopili.com...")
@@ -618,6 +619,19 @@ def mock_text():
     
     print(f"🤡 mOcKiNg: {result}")
 
+def show_ip():
+    try:
+        public_ip = requests.get("https://api.ipify.org").text
+    except:
+        public_ip = "Could not fetch"
+    try:
+        local_ip = socket.gethostbyname(socket.gethostname())
+    except:
+        local_ip = "Could not fetch"
+    
+    print(f"🌐 Public IP: {public_ip}")
+    print(f"💻 Local IP: {local_ip}")
+
 # --- Main program ---
 def main():
     if len(sys.argv) < 2:
@@ -626,7 +640,7 @@ def main():
         print("🌐 website, hello, excuse, secret, coinflip")
         print("⏰ time, uptime, countdown, remind")
         print("🌤️ weather, speedtest")
-        print("🖥️ cpu, memory, disk, procs, kill, net, battery, boot, env, user, top")
+        print("🖥️ cpu, memory, disk, procs, kill, net, battery, boot, env, user, top, ip")
         print("🎲 dice, ttt")
         print("📝 zalgo, reverse, mock, leet, flip")
         return
@@ -699,6 +713,8 @@ def main():
         leet_text()
     elif command == "flip":
         flip_text()
+    elif command == "ip":
+        show_ip()
     elif command == "ttt":
         tictactoe()
     else:
@@ -707,7 +723,7 @@ def main():
         print("🌐 website, hello, excuse, secret, coinflip")
         print("⏰ time, uptime, countdown, remind")
         print("🌤️ weather, speedtest")
-        print("🖥️ cpu, memory, disk, procs, kill, net, battery, boot, env, user, top")
+        print("🖥️ cpu, memory, disk, procs, kill, net, battery, boot, env, user, top, ip")
         print("🎲 dice, ttt")
         print("📝 zalgo, reverse, mock, leet, flip")
 

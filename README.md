@@ -35,6 +35,7 @@ A fun and versatile Python command-line utility that brings together system moni
 - **battery** - Show battery status if available
 - **env [VAR]** - Show all environment variables or a specific one
 - **user** - Show the current logged-in user
+- **ip** - Show the user's IP adress
 
 ### 📝 Text Manipulation
 - **zalgo [text]** - Convert text to spooky zalgo format
@@ -106,6 +107,7 @@ pili boot
 pili env
 pili env PATH
 pili user
+pili ip
 
 # Text fun
 pili zalgo "Hello World"
